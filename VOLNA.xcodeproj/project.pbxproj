@@ -1,0 +1,514 @@
+// !$*UTF8*$!
+{
+"archiveVersion" = 1;
+"classes" = {
+
+};
+"objectVersion" = 56;
+"objects" = {
+"8DAF845974660CDB8A5A65FA" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "FilmLibraryView.swift";
+"sourceTree" = "<group>";
+};
+"CEA2A9BC31916ECE9613A00F" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "8DAF845974660CDB8A5A65FA";
+};
+"9429F481037EBAA1D7D3161F" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "GlassDesign.swift";
+"sourceTree" = "<group>";
+};
+"87C57C9D85A39731DC555EBC" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "9429F481037EBAA1D7D3161F";
+};
+"D869D0DF828238BA1B2F42A4" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "LibraryStore.swift";
+"sourceTree" = "<group>";
+};
+"EA5BF5B443C8544C064381C2" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "D869D0DF828238BA1B2F42A4";
+};
+"4DB8DDF454D54FC8BF89D680" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "Models.swift";
+"sourceTree" = "<group>";
+};
+"D1B1E93CC8825EE71A6BC9AF" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "4DB8DDF454D54FC8BF89D680";
+};
+"79556CFC6353BC3A07FE5828" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "PlaybackStore.swift";
+"sourceTree" = "<group>";
+};
+"36C3E9CE32679403756D0714" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "79556CFC6353BC3A07FE5828";
+};
+"285ACC7FCA04D334E555A69F" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "RootView.swift";
+"sourceTree" = "<group>";
+};
+"95220384773AAE5B229AA82A" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "285ACC7FCA04D334E555A69F";
+};
+"4EBE2E461CB413E97768E1DE" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "TelevisionView.swift";
+"sourceTree" = "<group>";
+};
+"277D351E91DED7F144F080AD" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "4EBE2E461CB413E97768E1DE";
+};
+"4EC95204A1CA99112FBE4E34" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "VOLNAApp.swift";
+"sourceTree" = "<group>";
+};
+"55C41B3DEACD91ED65429C9D" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "4EC95204A1CA99112FBE4E34";
+};
+"7B281B5834FC2FFF02CCC69B" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "folder.assetcatalog";
+"path" = "Assets.xcassets";
+"sourceTree" = "<group>";
+};
+"E9DE0D47910D88D841ECC0EA" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "7B281B5834FC2FFF02CCC69B";
+};
+"839E6D129929424858FBD6EF" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "text.json";
+"path" = "catalog.json";
+"sourceTree" = "<group>";
+};
+"343731DA01DEAEC94D1FCF65" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "839E6D129929424858FBD6EF";
+};
+"2BBA19478F9D88BE14A79ABC" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "text.xml";
+"path" = "PrivacyInfo.xcprivacy";
+"sourceTree" = "<group>";
+};
+"DE537470761916175E69A353" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "2BBA19478F9D88BE14A79ABC";
+};
+"59BD0A3FF43B32849B319E64" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "text.plist.xml";
+"path" = "Info.plist";
+"sourceTree" = "<group>";
+};
+"3C3B0F03DC089F93B8457928" = {
+"isa" = "PBXGroup";
+"children" = ("8DAF845974660CDB8A5A65FA","9429F481037EBAA1D7D3161F","D869D0DF828238BA1B2F42A4","4DB8DDF454D54FC8BF89D680","79556CFC6353BC3A07FE5828","285ACC7FCA04D334E555A69F","4EBE2E461CB413E97768E1DE","4EC95204A1CA99112FBE4E34","7B281B5834FC2FFF02CCC69B","839E6D129929424858FBD6EF","2BBA19478F9D88BE14A79ABC","59BD0A3FF43B32849B319E64");
+"path" = "VOLNA";
+"sourceTree" = "<group>";
+};
+"7FF1594F02A39252B36C2788" = {
+"isa" = "XCBuildConfiguration";
+"name" = "Debug";
+"buildSettings" = {
+"SDKROOT" = "iphoneos";
+"IPHONEOS_DEPLOYMENT_TARGET" = "17.0";
+"SWIFT_VERSION" = "5.0";
+"CLANG_ENABLE_MODULES" = "YES";
+"CLANG_ENABLE_OBJC_ARC" = "YES";
+"ENABLE_USER_SCRIPT_SANDBOXING" = "YES";
+"SWIFT_STRICT_CONCURRENCY" = "targeted";
+"SWIFT_OPTIMIZATION_LEVEL" = "-Onone";
+"DEBUG_INFORMATION_FORMAT" = "dwarf";
+"ENABLE_TESTABILITY" = "YES";
+"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "DEBUG";
+};
+};
+"8AF42D9F8E598D010F7434BA" = {
+"isa" = "XCBuildConfiguration";
+"name" = "Release";
+"buildSettings" = {
+"SDKROOT" = "iphoneos";
+"IPHONEOS_DEPLOYMENT_TARGET" = "17.0";
+"SWIFT_VERSION" = "5.0";
+"CLANG_ENABLE_MODULES" = "YES";
+"CLANG_ENABLE_OBJC_ARC" = "YES";
+"ENABLE_USER_SCRIPT_SANDBOXING" = "YES";
+"SWIFT_STRICT_CONCURRENCY" = "targeted";
+"SWIFT_OPTIMIZATION_LEVEL" = "-O";
+"DEBUG_INFORMATION_FORMAT" = "dwarf-with-dsym";
+};
+};
+"6650A2B5E24FA7522CE6B81C" = {
+"isa" = "XCConfigurationList";
+"buildConfigurations" = ("7FF1594F02A39252B36C2788","8AF42D9F8E598D010F7434BA");
+"defaultConfigurationIsVisible" = 0;
+"defaultConfigurationName" = "Release";
+};
+"0E61CF76995E96FDE706B949" = {
+"isa" = "PBXFileReference";
+"explicitFileType" = "wrapper.application";
+"includeInIndex" = 0;
+"path" = "VOLNA.app";
+"sourceTree" = "BUILT_PRODUCTS_DIR";
+};
+"A1E41A2F6844BB20051D04B5" = {
+"isa" = "PBXSourcesBuildPhase";
+"buildActionMask" = 2147483647;
+"files" = ("CEA2A9BC31916ECE9613A00F","87C57C9D85A39731DC555EBC","EA5BF5B443C8544C064381C2","D1B1E93CC8825EE71A6BC9AF","36C3E9CE32679403756D0714","95220384773AAE5B229AA82A","277D351E91DED7F144F080AD","55C41B3DEACD91ED65429C9D");
+"runOnlyForDeploymentPostprocessing" = 0;
+};
+"A2ADE6378FD394EEE3DF413C" = {
+"isa" = "PBXFrameworksBuildPhase";
+"buildActionMask" = 2147483647;
+"files" = ();
+"runOnlyForDeploymentPostprocessing" = 0;
+};
+"F8D2C4A9A44E003C29819DD4" = {
+"isa" = "PBXResourcesBuildPhase";
+"buildActionMask" = 2147483647;
+"files" = ("E9DE0D47910D88D841ECC0EA","343731DA01DEAEC94D1FCF65","DE537470761916175E69A353");
+"runOnlyForDeploymentPostprocessing" = 0;
+};
+"7A0874E6B95A5AE3399FDCD3" = {
+"isa" = "XCBuildConfiguration";
+"name" = "Debug";
+"buildSettings" = {
+"PRODUCT_NAME" = "$(TARGET_NAME)";
+"PRODUCT_BUNDLE_IDENTIFIER" = "com.volna.cinema";
+"CODE_SIGN_STYLE" = "Automatic";
+"TARGETED_DEVICE_FAMILY" = "1,2";
+"CURRENT_PROJECT_VERSION" = "20";
+"MARKETING_VERSION" = "2.0.0";
+"SWIFT_EMIT_LOC_STRINGS" = "YES";
+"INFOPLIST_FILE" = "VOLNA/Info.plist";
+"GENERATE_INFOPLIST_FILE" = "NO";
+"ASSETCATALOG_COMPILER_APPICON_NAME" = "AppIcon";
+"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/Frameworks";
+"SUPPORTS_MACCATALYST" = "NO";
+"SWIFT_OPTIMIZATION_LEVEL" = "-Onone";
+"DEBUG_INFORMATION_FORMAT" = "dwarf";
+"ENABLE_TESTABILITY" = "YES";
+"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "DEBUG";
+};
+};
+"6DA335A5113497F14D2203E1" = {
+"isa" = "XCBuildConfiguration";
+"name" = "Release";
+"buildSettings" = {
+"PRODUCT_NAME" = "$(TARGET_NAME)";
+"PRODUCT_BUNDLE_IDENTIFIER" = "com.volna.cinema";
+"CODE_SIGN_STYLE" = "Automatic";
+"TARGETED_DEVICE_FAMILY" = "1,2";
+"CURRENT_PROJECT_VERSION" = "20";
+"MARKETING_VERSION" = "2.0.0";
+"SWIFT_EMIT_LOC_STRINGS" = "YES";
+"INFOPLIST_FILE" = "VOLNA/Info.plist";
+"GENERATE_INFOPLIST_FILE" = "NO";
+"ASSETCATALOG_COMPILER_APPICON_NAME" = "AppIcon";
+"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/Frameworks";
+"SUPPORTS_MACCATALYST" = "NO";
+"SWIFT_OPTIMIZATION_LEVEL" = "-O";
+"DEBUG_INFORMATION_FORMAT" = "dwarf-with-dsym";
+};
+};
+"BD9ABAB15B95BC65632DC20C" = {
+"isa" = "XCConfigurationList";
+"buildConfigurations" = ("7A0874E6B95A5AE3399FDCD3","6DA335A5113497F14D2203E1");
+"defaultConfigurationIsVisible" = 0;
+"defaultConfigurationName" = "Release";
+};
+"F75109BEB4DD8800DA6B45F8" = {
+"isa" = "PBXNativeTarget";
+"buildConfigurationList" = "BD9ABAB15B95BC65632DC20C";
+"buildPhases" = ("A1E41A2F6844BB20051D04B5","A2ADE6378FD394EEE3DF413C","F8D2C4A9A44E003C29819DD4");
+"buildRules" = ();
+"dependencies" = ();
+"name" = "VOLNA";
+"productName" = "VOLNA";
+"productReference" = "0E61CF76995E96FDE706B949";
+"productType" = "com.apple.product-type.application";
+};
+"04F4395D7D6DB82B4BBA4F4F" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "NativeModelTests.swift";
+"sourceTree" = "<group>";
+};
+"45FEB047E05B371D80853BDC" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "04F4395D7D6DB82B4BBA4F4F";
+};
+"30C2695B8E1483C1A4A3285A" = {
+"isa" = "PBXGroup";
+"path" = "VOLNATests";
+"children" = ("04F4395D7D6DB82B4BBA4F4F");
+"sourceTree" = "<group>";
+};
+"92BF7F3855FA06A4CDB71829" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "839E6D129929424858FBD6EF";
+};
+"CAC1C140280B5B2CA065E552" = {
+"isa" = "PBXFileReference";
+"explicitFileType" = "wrapper.cfbundle";
+"includeInIndex" = 0;
+"path" = "VOLNATests.xctest";
+"sourceTree" = "BUILT_PRODUCTS_DIR";
+};
+"253F1B21A881CD0705A87B28" = {
+"isa" = "PBXSourcesBuildPhase";
+"buildActionMask" = 2147483647;
+"files" = ("45FEB047E05B371D80853BDC");
+"runOnlyForDeploymentPostprocessing" = 0;
+};
+"F193D6F9C847453B24592AFD" = {
+"isa" = "PBXFrameworksBuildPhase";
+"buildActionMask" = 2147483647;
+"files" = ();
+"runOnlyForDeploymentPostprocessing" = 0;
+};
+"0380782492188DF43A449D28" = {
+"isa" = "PBXResourcesBuildPhase";
+"buildActionMask" = 2147483647;
+"files" = ("92BF7F3855FA06A4CDB71829");
+"runOnlyForDeploymentPostprocessing" = 0;
+};
+"6B0D30E32EC6DA381C665740" = {
+"isa" = "PBXContainerItemProxy";
+"containerPortal" = "98F54143AB4E86B28C3AFEE0";
+"proxyType" = 1;
+"remoteGlobalIDString" = "F75109BEB4DD8800DA6B45F8";
+"remoteInfo" = "VOLNA";
+};
+"E744D8889CD79523AC2286C1" = {
+"isa" = "PBXTargetDependency";
+"target" = "F75109BEB4DD8800DA6B45F8";
+"targetProxy" = "6B0D30E32EC6DA381C665740";
+};
+"99B60E0366F199D0F45DE3FC" = {
+"isa" = "XCBuildConfiguration";
+"name" = "Debug";
+"buildSettings" = {
+"PRODUCT_NAME" = "$(TARGET_NAME)";
+"PRODUCT_BUNDLE_IDENTIFIER" = "com.volna.cinema.VOLNATests";
+"CODE_SIGN_STYLE" = "Automatic";
+"TARGETED_DEVICE_FAMILY" = "1,2";
+"CURRENT_PROJECT_VERSION" = "20";
+"MARKETING_VERSION" = "2.0.0";
+"SWIFT_EMIT_LOC_STRINGS" = "YES";
+"GENERATE_INFOPLIST_FILE" = "YES";
+"TEST_HOST" = "$(BUILT_PRODUCTS_DIR)/VOLNA.app/VOLNA";
+"BUNDLE_LOADER" = "$(TEST_HOST)";
+"SWIFT_OPTIMIZATION_LEVEL" = "-Onone";
+"DEBUG_INFORMATION_FORMAT" = "dwarf";
+"ENABLE_TESTABILITY" = "YES";
+"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "DEBUG";
+};
+};
+"FE898F8AEE4E9947B04465C3" = {
+"isa" = "XCBuildConfiguration";
+"name" = "Release";
+"buildSettings" = {
+"PRODUCT_NAME" = "$(TARGET_NAME)";
+"PRODUCT_BUNDLE_IDENTIFIER" = "com.volna.cinema.VOLNATests";
+"CODE_SIGN_STYLE" = "Automatic";
+"TARGETED_DEVICE_FAMILY" = "1,2";
+"CURRENT_PROJECT_VERSION" = "20";
+"MARKETING_VERSION" = "2.0.0";
+"SWIFT_EMIT_LOC_STRINGS" = "YES";
+"GENERATE_INFOPLIST_FILE" = "YES";
+"TEST_HOST" = "$(BUILT_PRODUCTS_DIR)/VOLNA.app/VOLNA";
+"BUNDLE_LOADER" = "$(TEST_HOST)";
+"SWIFT_OPTIMIZATION_LEVEL" = "-O";
+"DEBUG_INFORMATION_FORMAT" = "dwarf-with-dsym";
+};
+};
+"50D5DBB1B3AE3E97CFC01C25" = {
+"isa" = "XCConfigurationList";
+"buildConfigurations" = ("99B60E0366F199D0F45DE3FC","FE898F8AEE4E9947B04465C3");
+"defaultConfigurationIsVisible" = 0;
+"defaultConfigurationName" = "Release";
+};
+"C062A5A4A7F4F37DD90F54CB" = {
+"isa" = "PBXNativeTarget";
+"buildConfigurationList" = "50D5DBB1B3AE3E97CFC01C25";
+"buildPhases" = ("253F1B21A881CD0705A87B28","F193D6F9C847453B24592AFD","0380782492188DF43A449D28");
+"buildRules" = ();
+"dependencies" = ("E744D8889CD79523AC2286C1");
+"name" = "VOLNATests";
+"productName" = "VOLNATests";
+"productReference" = "CAC1C140280B5B2CA065E552";
+"productType" = "com.apple.product-type.bundle.unit-test";
+};
+"CA03A949162C53DDB81CF743" = {
+"isa" = "PBXFileReference";
+"lastKnownFileType" = "sourcecode.swift";
+"path" = "NavigationTests.swift";
+"sourceTree" = "<group>";
+};
+"D4C22B0A1B091D183A5BF6CD" = {
+"isa" = "PBXBuildFile";
+"fileRef" = "CA03A949162C53DDB81CF743";
+};
+"95756CC6CFAB788EE6DE0AFB" = {
+"isa" = "PBXGroup";
+"path" = "VOLNAUITests";
+"children" = ("CA03A949162C53DDB81CF743");
+"sourceTree" = "<group>";
+};
+"0FBC7B0847A44D7E68F372C7" = {
+"isa" = "PBXFileReference";
+"explicitFileType" = "wrapper.cfbundle";
+"includeInIndex" = 0;
+"path" = "VOLNAUITests.xctest";
+"sourceTree" = "BUILT_PRODUCTS_DIR";
+};
+"5C335D8272B47B0465D8AE2C" = {
+"isa" = "PBXSourcesBuildPhase";
+"buildActionMask" = 2147483647;
+"files" = ("D4C22B0A1B091D183A5BF6CD");
+"runOnlyForDeploymentPostprocessing" = 0;
+};
+"0AF8436E0380211D14C85C41" = {
+"isa" = "PBXFrameworksBuildPhase";
+"buildActionMask" = 2147483647;
+"files" = ();
+"runOnlyForDeploymentPostprocessing" = 0;
+};
+"ADE88F116AA39F40862F67FE" = {
+"isa" = "PBXResourcesBuildPhase";
+"buildActionMask" = 2147483647;
+"files" = ();
+"runOnlyForDeploymentPostprocessing" = 0;
+};
+"3834C3CF35D35B0EA30535AB" = {
+"isa" = "PBXContainerItemProxy";
+"containerPortal" = "98F54143AB4E86B28C3AFEE0";
+"proxyType" = 1;
+"remoteGlobalIDString" = "F75109BEB4DD8800DA6B45F8";
+"remoteInfo" = "VOLNA";
+};
+"8F7D314B507FEFA0FD538F6E" = {
+"isa" = "PBXTargetDependency";
+"target" = "F75109BEB4DD8800DA6B45F8";
+"targetProxy" = "3834C3CF35D35B0EA30535AB";
+};
+"F1A5D6AA87A5A394D837C5DD" = {
+"isa" = "XCBuildConfiguration";
+"name" = "Debug";
+"buildSettings" = {
+"PRODUCT_NAME" = "$(TARGET_NAME)";
+"PRODUCT_BUNDLE_IDENTIFIER" = "com.volna.cinema.VOLNAUITests";
+"CODE_SIGN_STYLE" = "Automatic";
+"TARGETED_DEVICE_FAMILY" = "1,2";
+"CURRENT_PROJECT_VERSION" = "20";
+"MARKETING_VERSION" = "2.0.0";
+"SWIFT_EMIT_LOC_STRINGS" = "YES";
+"GENERATE_INFOPLIST_FILE" = "YES";
+"TEST_TARGET_NAME" = "VOLNA";
+"SWIFT_OPTIMIZATION_LEVEL" = "-Onone";
+"DEBUG_INFORMATION_FORMAT" = "dwarf";
+"ENABLE_TESTABILITY" = "YES";
+"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "DEBUG";
+};
+};
+"1AFE15330FC2015FF6223562" = {
+"isa" = "XCBuildConfiguration";
+"name" = "Release";
+"buildSettings" = {
+"PRODUCT_NAME" = "$(TARGET_NAME)";
+"PRODUCT_BUNDLE_IDENTIFIER" = "com.volna.cinema.VOLNAUITests";
+"CODE_SIGN_STYLE" = "Automatic";
+"TARGETED_DEVICE_FAMILY" = "1,2";
+"CURRENT_PROJECT_VERSION" = "20";
+"MARKETING_VERSION" = "2.0.0";
+"SWIFT_EMIT_LOC_STRINGS" = "YES";
+"GENERATE_INFOPLIST_FILE" = "YES";
+"TEST_TARGET_NAME" = "VOLNA";
+"SWIFT_OPTIMIZATION_LEVEL" = "-O";
+"DEBUG_INFORMATION_FORMAT" = "dwarf-with-dsym";
+};
+};
+"0D31706AF358B20D7579033A" = {
+"isa" = "XCConfigurationList";
+"buildConfigurations" = ("F1A5D6AA87A5A394D837C5DD","1AFE15330FC2015FF6223562");
+"defaultConfigurationIsVisible" = 0;
+"defaultConfigurationName" = "Release";
+};
+"794AAC98ACE6EB716B86C3A5" = {
+"isa" = "PBXNativeTarget";
+"buildConfigurationList" = "0D31706AF358B20D7579033A";
+"buildPhases" = ("5C335D8272B47B0465D8AE2C","0AF8436E0380211D14C85C41","ADE88F116AA39F40862F67FE");
+"buildRules" = ();
+"dependencies" = ("8F7D314B507FEFA0FD538F6E");
+"name" = "VOLNAUITests";
+"productName" = "VOLNAUITests";
+"productReference" = "0FBC7B0847A44D7E68F372C7";
+"productType" = "com.apple.product-type.bundle.ui-testing";
+};
+"FBDC4F23F93125BBEEAE800C" = {
+"isa" = "PBXGroup";
+"children" = ("0E61CF76995E96FDE706B949","CAC1C140280B5B2CA065E552","0FBC7B0847A44D7E68F372C7");
+"name" = "Products";
+"sourceTree" = "<group>";
+};
+"870B3294C0CBD48AF6BBCC1B" = {
+"isa" = "PBXGroup";
+"children" = ("3C3B0F03DC089F93B8457928","30C2695B8E1483C1A4A3285A","95756CC6CFAB788EE6DE0AFB","FBDC4F23F93125BBEEAE800C");
+"sourceTree" = "<group>";
+};
+"98F54143AB4E86B28C3AFEE0" = {
+"isa" = "PBXProject";
+"attributes" = {
+"BuildIndependentTargetsInParallel" = "YES";
+"LastUpgradeCheck" = "2600";
+"TargetAttributes" = {
+"F75109BEB4DD8800DA6B45F8" = {
+"CreatedOnToolsVersion" = "26.0";
+};
+"C062A5A4A7F4F37DD90F54CB" = {
+"CreatedOnToolsVersion" = "26.0";
+"TestTargetID" = "F75109BEB4DD8800DA6B45F8";
+};
+"794AAC98ACE6EB716B86C3A5" = {
+"CreatedOnToolsVersion" = "26.0";
+"TestTargetID" = "F75109BEB4DD8800DA6B45F8";
+};
+};
+};
+"buildConfigurationList" = "6650A2B5E24FA7522CE6B81C";
+"compatibilityVersion" = "Xcode 14.0";
+"developmentRegion" = "uk";
+"hasScannedForEncodings" = 0;
+"knownRegions" = ("uk","en","Base");
+"mainGroup" = "870B3294C0CBD48AF6BBCC1B";
+"productRefGroup" = "FBDC4F23F93125BBEEAE800C";
+"projectDirPath" = "";
+"projectRoot" = "";
+"targets" = ("F75109BEB4DD8800DA6B45F8","C062A5A4A7F4F37DD90F54CB","794AAC98ACE6EB716B86C3A5");
+};
+};
+"rootObject" = "98F54143AB4E86B28C3AFEE0";
+}
