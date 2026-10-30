@@ -22,7 +22,14 @@ struct GlassSurface: ViewModifier {
         }
     }
 }
-extension View { func volnaGlass(_ radius: CGFloat = 24) -> some View { modifier(GlassSurface(radius: radius)) } }
+extension View {
+    func volnaGlass(_ radius: CGFloat = 24) -> some View { modifier(GlassSurface(radius: radius)) }
+    // Scrolling content uses a static sheen. Live Liquid Glass remains on controls.
+    func volnaCard(_ radius: CGFloat = 24) -> some View {
+        background(LinearGradient(colors: [Color(red: 0.14, green: 0.13, blue: 0.18), VolnaStyle.ink], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: radius))
+            .overlay(RoundedRectangle(cornerRadius: radius).stroke(LinearGradient(colors: [.white.opacity(0.22), .white.opacity(0.04)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 0.7))
+    }
+}
 
 struct GlassPressStyle: ButtonStyle {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -96,7 +103,7 @@ struct EmptyMessage: View {
             Image(systemName: symbol).font(.system(size: 30, weight: .light)).foregroundStyle(VolnaStyle.rose)
             Text(title).font(.headline)
             Text(message).font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
-        }.frame(maxWidth: .infinity).padding(28).volnaGlass()
+        }.frame(maxWidth: .infinity).padding(28).volnaCard()
     }
 }
 struct SearchField: View {
@@ -118,7 +125,7 @@ struct PosterArt: View {
         ZStack {
             LinearGradient(colors: [Color.indigo.opacity(0.6), VolnaStyle.coral.opacity(0.25), VolnaStyle.ink], startPoint: .topLeading, endPoint: .bottomTrailing)
             Image(systemName: "film.stack").font(.system(size: 38, weight: .ultraLight)).foregroundStyle(.white.opacity(0.35))
-            AsyncImage(url: film.posterURL) { image in image.resizable().scaledToFill() } placeholder: { Color.clear }
+            RemoteArtwork(url: film.posterURL)
         }.clipped().accessibilityHidden(true)
     }
 }

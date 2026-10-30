@@ -46,12 +46,16 @@ final class LibraryStore: ObservableObject {
     @Published private(set) var catalogueOffline = false
     @Published private(set) var guideErrors: Set<String> = []
     @Published private(set) var archiveRecovering: Set<String> = []
+    @Published private(set) var clock = Date()
     @Published var channelID: String?
     @Published var dayOffset = 0
     @Published var favoritesOnly = false
     private let api = APIClient()
     private var isUITesting: Bool { ProcessInfo.processInfo.arguments.contains("--ui-testing") }
     private var lastSummary = Date.distantPast
+    private var summaryInFlight = false
+    private var guideInFlight: Set<String> = []
+    private var index = ChannelIndex(catalogue: nil)
     private var archiveChecks: [String: Date] = [:]
     private var archiveInFlight: Set<String> = []
     private let cacheRoot: URL
@@ -63,7 +67,9 @@ final class LibraryStore: ObservableObject {
         try? FileManager.default.createDirectory(at: cacheRoot, withIntermediateDirectories: true)
         let cached = try? Data(contentsOf: cacheRoot.appendingPathComponent("catalogue.json"))
         let bundled = Bundle.main.url(forResource: "catalog", withExtension: "json").flatMap { try? Data(contentsOf: $0) }
-        if let data = cached ?? bundled { catalogue = try? JSONDecoder().decode(Catalogue.self, from: data) }
+        catalogue = cached.flatMap { try? JSONDecoder().decode(Catalogue.self, from: $0) }
+            ?? bundled.flatMap { try? JSONDecoder().decode(Catalogue.self, from: $0) }
+        index = ChannelIndex(catalogue: catalogue)
         catalogueOffline = true
         for id in ["novyi", "tet"] {
             if let data = try? Data(contentsOf: cacheRoot.appendingPathComponent("archive-\(id).json")),
@@ -73,10 +79,10 @@ final class LibraryStore: ObservableObject {
         }
         if selectedChannel == nil { channelID = channels.first?.id }
     }
-    var channels: [Channel] { catalogue?.ukrainianChannels ?? [] }
-    var selectedChannel: Channel? { channels.first { $0.id == channelID } }
+    var channels: [Channel] { index.channels }
+    var selectedChannel: Channel? { channelID.flatMap { index.byID[$0] } }
     var films: [Film] { catalogue?.movies ?? [] }
-    var categories: [String] { Array(Set(channels.compactMap(\.category))).sorted() }
+    var categories: [String] { index.categories }
     var guideKey: String { (channelID ?? "") + ":" + KyivClock.key(KyivClock.day(dayOffset)) }
     var selectedGuide: GuideDay? { guides[guideKey] }
 
@@ -109,6 +115,7 @@ final class LibraryStore: ObservableObject {
         do {
             let (value, data) = try await api.load(Catalogue.self, url: VolnaConfiguration.api("catalog.json"))
             guard !value.channels.isEmpty, value.channels.count <= 1000, value.movies.count <= 5000 else { throw LibraryFailure.invalid }
+            index = ChannelIndex(catalogue: value)
             catalogue = value; catalogueOffline = false
             try? data.write(to: cacheRoot.appendingPathComponent("catalogue.json"), options: .atomic)
             if selectedChannel == nil { channelID = channels.first?.id }
@@ -116,17 +123,22 @@ final class LibraryStore: ObservableObject {
     }
     func refreshSummary(force: Bool = false) async {
         guard !isUITesting else { return }
+        guard !summaryInFlight else { return }
         guard force || Date().timeIntervalSince(lastSummary) > 55 else { return }
+        summaryInFlight = true; defer { summaryInFlight = false }
         do {
             let (value, _) = try await api.load(GuideSummary.self, url: VolnaConfiguration.api("api/guide"))
             guard value.status == "ok" else { return }
-            summary = value.channels; lastSummary = Date()
+            if summary != value.channels { summary = value.channels }
+            lastSummary = Date()
         } catch { /* Retain cached rows; now() checks their time boundaries. */ }
     }
     func refreshSelectedGuide() async {
         guard !isUITesting else { return }
         guard let id = channelID else { return }
         let day = KyivClock.key(KyivClock.day(dayOffset)), key = id + ":" + day
+        guard !guideInFlight.contains(key) else { return }
+        guideInFlight.insert(key); defer { guideInFlight.remove(key) }
         if guides[key] == nil, let data = try? Data(contentsOf: cacheRoot.appendingPathComponent("guide-\(id)-\(day).json")) {
             guides[key] = try? JSONDecoder().decode(GuideDay.self, from: data)
         }
@@ -134,8 +146,11 @@ final class LibraryStore: ObservableObject {
             let (value, data) = try await api.load(GuideDay.self, url: VolnaConfiguration.api("api/guide", query: [.init(name: "channel", value: id), .init(name: "date", value: day)]))
             try Task.checkCancellation()
             if value.status == "ok" {
-                guides[key] = value; guideErrors.remove(key)
-                try? data.write(to: cacheRoot.appendingPathComponent("guide-\(id)-\(day).json"), options: .atomic)
+                if guides[key] != value {
+                    guides[key] = value
+                    try? data.write(to: cacheRoot.appendingPathComponent("guide-\(id)-\(day).json"), options: .atomic)
+                }
+                if guideErrors.contains(key) { guideErrors.remove(key) }
             } else { guideErrors.insert(key) }
         } catch is CancellationError { return } catch { guideErrors.insert(key) }
     }
@@ -150,13 +165,20 @@ final class LibraryStore: ObservableObject {
             if value.state?.archiveRecovering == true { archiveRecovering.insert(id) }
             else {
                 let rows = value.recordings.filter { $0.channelId == id && $0.isPlayable(at: Date()) }
-                recordings[id] = rows; archiveRecovering.remove(id)
-                if let data = try? JSONEncoder().encode(rows) { try? data.write(to: cacheRoot.appendingPathComponent("archive-\(id).json"), options: .atomic) }
+                if recordings[id] != rows {
+                    recordings[id] = rows
+                    if let data = try? JSONEncoder().encode(rows) { try? data.write(to: cacheRoot.appendingPathComponent("archive-\(id).json"), options: .atomic) }
+                }
+                if archiveRecovering.contains(id) { archiveRecovering.remove(id) }
             }
         } catch is CancellationError { return } catch { archiveRecovering.insert(id) }
-        recordings[id] = recordings[id]?.filter { $0.isPlayable(at: Date()) }
+        if let old = recordings[id] {
+            let valid = old.filter { $0.isPlayable(at: Date()) }
+            if old != valid { recordings[id] = valid }
+        }
     }
     func refreshVisible() async {
+        clock = Date()
         await refreshSummary(); await refreshSelectedGuide()
         if let id = channelID { await refreshArchive(channelID: id) }
         pruneCache()

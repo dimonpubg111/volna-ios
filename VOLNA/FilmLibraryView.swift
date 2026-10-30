@@ -126,8 +126,8 @@ struct MyLibraryView: View {
                     Label("VOLNA для iPhone", systemImage: "iphone").font(.headline)
                     Text("Нативний інтерфейс, системне відтворення, AirPlay і «Картинка в картинці». Реклама, що вже міститься у відеопотоці, може залишатися.").font(.caption).foregroundStyle(.secondary)
                     Button { settings = true } label: { Label("Налаштування відтворення", systemImage: "gearshape").font(.subheadline) }
-                    Text("Версія 2.0 · Обране зберігається локально. Відео не завантажується для офлайн-перегляду.").font(.caption2).foregroundStyle(.secondary)
-                }.padding(20).volnaGlass()
+                    Text("Версія 2.1 · Обране зберігається локально. Відео не завантажується для офлайн-перегляду.").font(.caption2).foregroundStyle(.secondary)
+                }.padding(20).volnaCard()
             }.padding(20)
         }.background { CinemaBackdrop() }.navigationTitle("Моє").navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $settings) { PlaybackSettings() }

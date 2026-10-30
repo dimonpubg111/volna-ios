@@ -71,7 +71,7 @@ for name, target_id, folder, files, resource_files, is_ui in [
         add(name+'-frameworks', 'PBXFrameworksBuildPhase', buildActionMask=2147483647, files=[], runOnlyForDeploymentPostprocessing=0),
         add(name+'-resources', 'PBXResourcesBuildPhase', buildActionMask=2147483647, files=resource_files, runOnlyForDeploymentPostprocessing=0),
     ]
-    settings = dict(PRODUCT_NAME='$(TARGET_NAME)', PRODUCT_BUNDLE_IDENTIFIER='com.volna.cinema' + ('' if app else '.'+name), CODE_SIGN_STYLE='Automatic', TARGETED_DEVICE_FAMILY='1,2', CURRENT_PROJECT_VERSION='20', MARKETING_VERSION='2.0.0', SWIFT_EMIT_LOC_STRINGS='YES')
+    settings = dict(PRODUCT_NAME='$(TARGET_NAME)', PRODUCT_BUNDLE_IDENTIFIER='com.volna.cinema' + ('' if app else '.'+name), CODE_SIGN_STYLE='Automatic', TARGETED_DEVICE_FAMILY='1,2', CURRENT_PROJECT_VERSION='21', MARKETING_VERSION='2.1.0', SWIFT_EMIT_LOC_STRINGS='YES')
     if app:
         settings.update(INFOPLIST_FILE='VOLNA/Info.plist', GENERATE_INFOPLIST_FILE='NO', ASSETCATALOG_COMPILER_APPICON_NAME='AppIcon', LD_RUNPATH_SEARCH_PATHS='$(inherited) @executable_path/Frameworks', SUPPORTS_MACCATALYST='NO')
     else:

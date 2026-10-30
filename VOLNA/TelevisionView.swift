@@ -156,8 +156,11 @@ struct PlayerStage: View {
             }
         }.overlay(alignment: .topTrailing) {
             if displaysActive && playback.hasVideo {
-                Button { settings = true } label: { Image(systemName: "gearshape").font(.system(size: 15, weight: .semibold)).frame(width: 36, height: 36).background(.black.opacity(0.65), in: Circle()) }
-                    .buttonStyle(.plain).padding(10).accessibilityLabel("Налаштування відео")
+                HStack(spacing: 8) {
+                    AirPlayRouteButton().frame(width: 44, height: 44).background(.black.opacity(0.65), in: Circle())
+                    Button { settings = true } label: { Image(systemName: "gearshape").font(.system(size: 15, weight: .semibold)).frame(width: 44, height: 44).background(.black.opacity(0.65), in: Circle()) }
+                        .buttonStyle(.plain).accessibilityLabel("Налаштування відео")
+                }.padding(10)
             }
         }.overlay(alignment: .bottom) {
             if displaysActive && playback.slowConnection && playback.error == nil {
@@ -211,7 +214,7 @@ struct ProgrammeGuideView: View {
                                 Text(KyivClock.time(recording.startDate)).font(.subheadline.monospacedDigit()).foregroundStyle(.secondary).frame(width: 50)
                                 VStack(alignment: .leading, spacing: 5) { Text(recording.title).font(.subheadline.weight(.medium)); Text(recording.label).font(.caption).foregroundStyle(VolnaStyle.rose) }
                                 Spacer(); Image(systemName: "play.circle.fill").foregroundStyle(VolnaStyle.coral)
-                            }.padding(16).volnaGlass(18)
+                            }.padding(16).volnaCard(18)
                         }.buttonStyle(.plain).padding(.horizontal, 16)
                     }
                     if !programmes.isEmpty {

@@ -59,4 +59,28 @@ final class NativeModelTests: XCTestCase {
         XCTAssertTrue(film.matches("РАША ГУДБАЙ"))
         XCTAssertFalse(film.matches("несуществующий сериал"))
     }
+    func testConcurrentClockReadsKeepKyivTimeAndDateBoundaries() async {
+        let results = await withTaskGroup(of: Bool.self, returning: [Bool].self) { group in
+            for _ in 0..<100 {
+                group.addTask {
+                    guard let date = KyivClock.parse("2026-10-30T22:10:00.125Z") else { return false }
+                    return KyivClock.key(date) == "2026-10-31" && KyivClock.time(date) == "00:10"
+                }
+            }
+            var values: [Bool] = []
+            for await value in group { values.append(value) }
+            return values
+        }
+        XCTAssertEqual(results.count, 100)
+        XCTAssertTrue(results.allSatisfy { $0 })
+    }
+    func testChannelIndexMaintainsLookupAndCategoryOrder() throws {
+        let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "catalog", withExtension: "json"))
+        let catalogue = try JSONDecoder().decode(Catalogue.self, from: Data(contentsOf: url))
+        let index = ChannelIndex(catalogue: catalogue)
+        XCTAssertEqual(index.channels.count, index.byID.count)
+        XCTAssertEqual(index.byID["tet"]?.id, "tet")
+        XCTAssertEqual(index.categories, index.categories.sorted())
+        XCTAssertEqual(ChannelIndex(catalogue: nil).channels.count, 0)
+    }
 }

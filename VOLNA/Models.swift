@@ -84,6 +84,18 @@ struct Catalogue: Codable, Sendable {
     }
 }
 
+// Construct once per catalogue update, rather than sorting during each row render.
+struct ChannelIndex: Sendable {
+    let channels: [Channel]
+    let byID: [String: Channel]
+    let categories: [String]
+    init(catalogue: Catalogue?) {
+        channels = catalogue?.ukrainianChannels ?? []
+        byID = Dictionary(channels.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        categories = Array(Set(channels.compactMap(\.category))).sorted()
+    }
+}
+
 struct Programme: Codable, Identifiable, Hashable, Sendable {
     let id: String
     let title: String
@@ -105,11 +117,11 @@ struct Programme: Codable, Identifiable, Hashable, Sendable {
 }
 
 struct GuideSummary: Codable, Sendable {
-    struct Entry: Codable, Sendable { let now: Programme?; let next: Programme? }
+    struct Entry: Codable, Sendable, Equatable { let now: Programme?; let next: Programme? }
     let status: String
     let channels: [String: Entry]
 }
-struct GuideDay: Codable, Sendable {
+struct GuideDay: Codable, Sendable, Equatable {
     let status: String
     let programmes: [Programme]
     let availableDates: [String]?
@@ -153,33 +165,62 @@ struct ArchiveCatalogue: Codable, Sendable {
     let state: State?
 }
 
+// Formatters are expensive. Access is serialized because API decoding and UI work
+// can run on different executors; the bounded cache holds no video or user data.
+private final class KyivDateCache: @unchecked Sendable {
+    private let lock = NSLock()
+    private let dates = NSCache<NSString, NSDate>()
+    private let fractional = ISO8601DateFormatter()
+    private let plain = ISO8601DateFormatter()
+    private let dayKey = DateFormatter()
+    private let clock = DateFormatter()
+    private let dayTitle = DateFormatter()
+    init() {
+        dates.countLimit = 4096
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        for formatter in [dayKey, clock, dayTitle] {
+            formatter.calendar = KyivClock.calendar
+            formatter.timeZone = KyivClock.calendar.timeZone
+            formatter.locale = Locale(identifier: "uk_UA")
+        }
+        dayKey.locale = Locale(identifier: "en_US_POSIX")
+        dayKey.dateFormat = "yyyy-MM-dd"; clock.dateFormat = "HH:mm"; dayTitle.dateFormat = "d MMM"
+    }
+    func parse(_ value: String) -> Date? {
+        lock.lock(); defer { lock.unlock() }
+        if let cached = dates.object(forKey: value as NSString) { return cached as Date }
+        guard let date = fractional.date(from: value) ?? plain.date(from: value) else { return nil }
+        dates.setObject(date as NSDate, forKey: value as NSString)
+        return date
+    }
+    func key(_ date: Date) -> String { lock.lock(); defer { lock.unlock() }; return dayKey.string(from: date) }
+    func time(_ date: Date) -> String { lock.lock(); defer { lock.unlock() }; return clock.string(from: date) }
+    func title(_ date: Date) -> String { lock.lock(); defer { lock.unlock() }; return dayTitle.string(from: date) }
+}
+
 enum KyivClock {
-    static var calendar: Calendar {
+    static let calendar: Calendar = {
         var c = Calendar(identifier: .gregorian)
         c.timeZone = TimeZone(identifier: "Europe/Kyiv")!
         return c
-    }
+    }()
+    private static let cache = KyivDateCache()
     static func parse(_ value: String) -> Date? {
-        let f = ISO8601DateFormatter(); f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return f.date(from: value) ?? ISO8601DateFormatter().date(from: value)
+        cache.parse(value)
     }
     static func key(_ date: Date = Date()) -> String {
-        let f = DateFormatter(); f.calendar = calendar; f.timeZone = calendar.timeZone
-        f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "yyyy-MM-dd"
-        return f.string(from: date)
+        cache.key(date)
     }
     static func time(_ date: Date?) -> String {
         guard let date else { return "—" }
-        let f = DateFormatter(); f.locale = Locale(identifier: "uk_UA"); f.timeZone = calendar.timeZone; f.dateFormat = "HH:mm"
-        return f.string(from: date)
+        return cache.time(date)
     }
     static func day(_ offset: Int, from now: Date = Date()) -> Date {
         calendar.date(byAdding: .day, value: offset, to: calendar.startOfDay(for: now))!
     }
     static func dayLabel(_ offset: Int) -> String {
         if offset == 0 { return "Сьогодні" }; if offset == -1 { return "Вчора" }; if offset == -2 { return "Позавчора" }
-        let f = DateFormatter(); f.locale = Locale(identifier: "uk_UA"); f.timeZone = calendar.timeZone; f.dateFormat = "d MMM"
-        return f.string(from: day(offset))
+        return cache.title(day(offset))
     }
 }
 extension String {

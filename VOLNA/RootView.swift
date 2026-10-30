@@ -81,7 +81,14 @@ struct HomeView: View {
                 if let featured { hero(featured) }
                 HStack(spacing: 12) {
                     fact("tv", value: "\(library.channels.count)", label: "каналів у плеєрі")
-                    fact("airplayvideo", value: "AirPlay", label: "на великий екран")
+                    HStack(spacing: 4) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("AirPlay").font(.subheadline.bold())
+                            Text("Обрати екран").font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 0)
+                        AirPlayRouteButton().frame(width: 44, height: 44)
+                    }.padding(.horizontal, 14).padding(.vertical, 7).frame(maxWidth: .infinity).volnaCard(22)
                 }
                 VStack(alignment: .leading, spacing: 14) {
                     sectionTitle("Зараз в ефірі", subtitle: "Те, що люблять дивитися")
@@ -94,7 +101,7 @@ struct HomeView: View {
                                         Text(channel.title).font(.headline).lineLimit(1)
                                         Text(library.now(for: channel)?.title ?? "Прямий ефір").font(.caption).foregroundStyle(.secondary).lineLimit(2)
                                     }
-                                }.padding(18).frame(width: 240, alignment: .leading).volnaGlass()
+                                }.padding(18).frame(width: 240, alignment: .leading).volnaCard()
                             }.buttonStyle(.plain)
                         } }
                     }.contentMargins(.trailing, 2)
@@ -123,7 +130,7 @@ struct HomeView: View {
             ZStack(alignment: .bottomLeading) {
                 LinearGradient(colors: [Color(hex: channel.color).opacity(0.55), Color.indigo.opacity(0.5), VolnaStyle.ink], startPoint: .topLeading, endPoint: .bottomTrailing)
                 if let programme = library.now(for: channel), let image = programme.imageURL {
-                    AsyncImage(url: image) { picture in picture.resizable().scaledToFill() } placeholder: { Color.clear }
+                    RemoteArtwork(url: image, pixels: 1024)
                 }
                 LinearGradient(colors: [.clear, .black.opacity(0.85)], startPoint: .top, endPoint: .bottom)
                 VStack(alignment: .leading, spacing: 16) {
@@ -145,7 +152,7 @@ struct HomeView: View {
             Image(systemName: symbol).foregroundStyle(VolnaStyle.rose)
             VStack(alignment: .leading, spacing: 3) { Text(value).font(.subheadline.bold()); Text(label).font(.caption2).foregroundStyle(.secondary) }
             Spacer(minLength: 0)
-        }.padding(16).frame(maxWidth: .infinity, alignment: .leading).volnaGlass(22)
+        }.padding(16).frame(maxWidth: .infinity, alignment: .leading).volnaCard(22)
     }
     private func sectionTitle(_ title: String, subtitle: String) -> some View {
         VStack(alignment: .leading, spacing: 4) { Text(title).font(.title3.bold()); Text(subtitle).font(.caption).foregroundStyle(.secondary) }
