@@ -7,3 +7,6 @@ xcuserdata/
 *.mobileprovision
 *.p8
 *.ipa
+
+__pycache__/
+*.pyc
