@@ -15,5 +15,5 @@ xcodebuild build -project VOLNA.xcodeproj -scheme VOLNA -configuration Release \
   -destination 'generic/platform=iOS' -derivedDataPath build/Device CODE_SIGNING_ALLOWED=NO
 ditto -c -k --sequesterRsrc --keepParent build/DerivedData/Build/Products/Debug-iphonesimulator/VOLNA.app build/VOLNA-Simulator.app.zip
 ditto -c -k --sequesterRsrc --keepParent build/Device/Build/Products/Release-iphoneos/VOLNA.app build/VOLNA-Device-UNSIGNED.app.zip
-python3 scripts/package_unsigned_ipa.py build/Device/Build/Products/Release-iphoneos/VOLNA.app build/VOLNA-2.1-UNSIGNED.ipa
+python3 scripts/package_unsigned_ipa.py build/Device/Build/Products/Release-iphoneos/VOLNA.app build/VOLNA-2.2-UNSIGNED.ipa
 echo 'Simulator tests and unsigned device compilation completed. Device installation still requires Apple signing.'

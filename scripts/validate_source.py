@@ -3,7 +3,7 @@ from pathlib import Path
 import json, plistlib, sys, xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-tooling = ROOT.parents[0]/'tooling/swift-syntax-check'
+tooling = ROOT.parent/'validation-lib'
 if tooling.exists(): sys.path.insert(0, str(tooling))
 import tree_sitter, tree_sitter_swift
 from openstep_parser import OpenStepDecoder
