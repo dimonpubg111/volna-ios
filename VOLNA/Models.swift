@@ -60,7 +60,10 @@ struct Film: Codable, Identifiable, Hashable, Sendable {
     let sources: [MediaSource]
     let playbackAvailable: Bool?
     let availabilityNote: String?
+    let matureContent: Bool?
     var nativeSource: MediaSource? {
+        // These two broadcaster-public films are resolved afresh from this device.
+        if let source = sources.first(where: { $0.type == "hls" && $0.publicMovieId == id && OfficialFilmResolver.supports(id) }) { return source }
         guard playbackAvailable != false else { return nil }
         return sources.first { $0.nativeURL != nil }
     }
@@ -68,6 +71,45 @@ struct Film: Codable, Identifiable, Hashable, Sendable {
     func matches(_ query: String) -> Bool {
         ([title, genre ?? "", year.map(String.init) ?? ""] + (searchAliases ?? [])).joined(separator: " ").matchesSearch(query)
     }
+}
+
+enum OfficialFilmResolver {
+    private struct Expected { let video: String; let minimum: Int; let maximum: Int }
+    private static let movies = ["rasha-hudbai": Expected(video: "hu7B3j1R", minimum: 5900, maximum: 6200), "black-raven": Expected(video: "DtPGoifu", minimum: 6500, maximum: 6700), "svingery": Expected(video: "cuh7frgR", minimum: 5520, maximum: 5550), "svingery-2": Expected(video: "fCQ6y5La", minimum: 5130, maximum: 5160), "ya-s-toboj": Expected(video: "7tzK4FaJ", minimum: 5160, maximum: 5190), "bitva-za-kiyiv": Expected(video: "L28nB9f2", minimum: 3200, maximum: 3230), "chat-vijni-moshtun": Expected(video: "NCkKIddR", minimum: 2930, maximum: 2960)]
+    private struct Configuration: Decodable { let id: String; let duration: Int; let live: Bool; let dl: Int; let bpas: Int; let balancer: String }
+    static func supports(_ id: String) -> Bool { movies[id] != nil }
+    static func resolve(_ id: String) async throws -> URL {
+        guard let expected = movies[id], let embed = URL(string: "https://1plus1.video/video/embed/" + expected.video) else { throw LibraryFailure.invalid }
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.httpShouldSetCookies = false; configuration.httpCookieStorage = nil; configuration.urlCache = nil
+        configuration.timeoutIntervalForRequest = 15; configuration.timeoutIntervalForResource = 20
+        let session = URLSession(configuration: configuration, delegate: OfficialFilmRedirectGuard(), delegateQueue: nil)
+        defer { session.invalidateAndCancel() }
+        let html = try await text(embed, limit: 128_000, session: session)
+        let regex = try NSRegularExpression(pattern: #"new OVVA\(\s*"ovva-player"\s*,\s*"([A-Za-z0-9+/=]{1,90000})""#)
+        guard let match = regex.firstMatch(in: html, range: NSRange(html.startIndex..., in: html)), let range = Range(match.range(at: 1), in: html), let data = Data(base64Encoded: String(html[range])) else { throw LibraryFailure.invalid }
+        let c = try JSONDecoder().decode(Configuration.self, from: data)
+        guard c.id == expected.video, !c.live, c.dl == -1, c.bpas == -1, (expected.minimum...expected.maximum).contains(c.duration),
+              let balancer = URL(string: c.balancer), balancer.scheme == "https", balancer.host == "grandcentral.1plus1.video", balancer.path.hasPrefix("/vod/"), balancer.user == nil, balancer.password == nil, balancer.port == nil, balancer.query == nil, balancer.fragment == nil else { throw LibraryFailure.invalid }
+        let reply = try await text(balancer, limit: 4096, session: session).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard reply.hasPrefix("302="), let media = URL(string: String(reply.dropFirst(4))), media.scheme == "https", media.port == nil,
+              let host = media.host, host.range(of: #"^vod-k\d{4}-kbp\.1plus1\.video$"#, options: .regularExpression) != nil,
+              media.user == nil, media.password == nil, media.query == nil, media.fragment == nil,
+              media.path.range(of: #"^/vod/\d{10}/[A-Za-z0-9_-]+/\d{6}/[a-f0-9/]+\.smil/playlist\.m3u8$"#, options: .regularExpression) != nil,
+              let expires = TimeInterval(media.path.split(separator: "/")[1]), expires > Date().timeIntervalSince1970 + 60 else { throw LibraryFailure.invalid }
+        try Task.checkCancellation(); return media
+    }
+    private static func text(_ url: URL, limit: Int, session: URLSession) async throws -> String {
+        let (bytes, response) = try await session.bytes(from: url)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200, response.expectedContentLength <= Int64(limit) else { throw LibraryFailure.unavailable }
+        var data = Data()
+        for try await byte in bytes { if data.count >= limit { throw LibraryFailure.oversized }; if data.count % 4096 == 0 { try Task.checkCancellation() }; data.append(byte) }
+        guard let value = String(data: data, encoding: .utf8) else { throw LibraryFailure.invalid }; return value
+    }
+}
+private final class OfficialFilmRedirectGuard: NSObject, URLSessionTaskDelegate {
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
 }
 
 struct Catalogue: Codable, Sendable {

@@ -27,9 +27,10 @@ struct FilmLibraryView: View {
     @State private var query = ""
     @State private var availableOnly = false
     @State private var genre = "Усі"
+    @AppStorage("winter.hideAdult") private var hideAdult = false
     private var genres: [String] { Array(Set(library.films.compactMap(\.genre))).sorted() }
     private var filtered: [Film] {
-        library.films.filter { (query.isEmpty || $0.matches(query)) && (!availableOnly || $0.nativeSource != nil) && (genre == "Усі" || $0.genre == genre) }
+        library.films.filter { (!hideAdult || $0.matureContent != true) && (query.isEmpty || $0.matches(query)) && (!availableOnly || $0.nativeSource != nil) && (genre == "Усі" || $0.genre == genre) }
     }
     var body: some View {
         ScrollView {
@@ -100,15 +101,52 @@ struct MyLibraryView: View {
     let onChannel: (Channel) -> Void
     let onFilm: (Film) -> Void
     @State private var settings = false
+    @AppStorage("winter.snow") private var snow = true
+    @AppStorage("winter.decorations") private var decorations = true
+    @AppStorage("winter.motion") private var motion = true
+    @AppStorage("winter.intro") private var intro = true
+    @AppStorage("winter.lightInterface") private var lightInterface = false
+    @AppStorage("winter.compact") private var compact = false
+    @AppStorage("winter.largeText") private var largeText = false
+    @AppStorage("winter.hideAdult") private var hideAdult = false
+    @AppStorage("winter.snowIntensity") private var snowIntensity = "light"
     private var channels: [Channel] { library.channels.filter { library.favorites.contains($0.id) } }
-    private var films: [Film] { library.films.filter { library.favorites.contains($0.id) } }
+    private var films: [Film] { library.films.filter { library.favorites.contains($0.id) && (!hideAdult || $0.matureContent != true) } }
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                HStack(spacing: 16) {
-                    Image(systemName: "heart.fill").font(.title2).foregroundStyle(VolnaStyle.rose).frame(width: 62, height: 62).volnaGlass(24)
-                    VStack(alignment: .leading, spacing: 4) { Text("Твій простір").font(.title2.bold()); Text("Без реєстрації. З турботою про тебе.").font(.caption).foregroundStyle(.secondary) }
-                }.padding(.top, 12)
+            LazyVStack(alignment: .leading, spacing: 22) {
+                VStack(alignment: .leading, spacing: 22) {
+                    Text("VOLNA · ОСОБИСТИЙ ПРОСТІР").font(.system(size: 9, weight: .medium)).tracking(2).foregroundStyle(Color(red: 0.74, green: 0.87, blue: 0.93))
+                    HStack(spacing: 14) {
+                        Image(systemName: "snowflake").font(.title).foregroundStyle(.white).frame(width: 58, height: 64).volnaGlass(22)
+                        VStack(alignment: .leading, spacing: 7) {
+                            Text("Твоя зимова хвиля").font(.system(.title2, design: .rounded).bold())
+                            Text("Трохи затишку. Усе улюблене поруч.").font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    HStack { Text("Зима 2026 / 2027"); Spacer(); Image(systemName: "sparkle").foregroundStyle(Color(red: 0.93, green: 0.8, blue: 0.59)) }.font(.caption2)
+                }.padding(22).volnaCard(28)
+                VStack(alignment: .leading, spacing: 18) {
+                    HStack { Text("Зроби по-своєму").font(.headline); Spacer(); Image(systemName: "slider.horizontal.3").foregroundStyle(.secondary) }
+                    winterSetting("Легкий сніг", note: "Сніжинки на головній. Без снігу під час відео.", symbol: "snowflake", value: $snow)
+                    Picker("Снігопад", selection: $snowIntensity) { Text("Легкий").tag("light"); Text("Помірний").tag("medium"); Text("Сніжний вечір").tag("full") }.font(.subheadline)
+                    Divider().overlay(.white.opacity(0.06))
+                    winterSetting("Святкові деталі", note: "Шапка на VOLNA та засніжений пейзаж.", symbol: "sparkles", value: $decorations)
+                    Divider().overlay(.white.opacity(0.06))
+                    winterSetting("М’яка анімація", note: "Вимкни, якщо хочеш менше руху.", symbol: "wind", value: $motion)
+                    Divider().overlay(.white.opacity(0.06))
+                    winterSetting("Зимова заставка", note: "Коротке привітання під час запуску застосунку.", symbol: "sparkle", value: $intro)
+                    Divider().overlay(.white.opacity(0.06))
+                    winterSetting("Легкий інтерфейс", note: "Без розмиття та рухомих ефектів.", symbol: "leaf", value: $lightInterface)
+                    Divider().overlay(.white.opacity(0.06))
+                    winterSetting("Компактні канали", note: "Більше каналів на одному екрані.", symbol: "list.bullet", value: $compact)
+                    Divider().overlay(.white.opacity(0.06))
+                    winterSetting("Крупніший текст", note: "Зручніше читати назви та налаштування.", symbol: "textformat.size", value: $largeText)
+                    Divider().overlay(.white.opacity(0.06))
+                    winterSetting("Без дорослих комедій", note: "Приховати «Свінгери» та інші дорослі добірки.", symbol: "heart", value: $hideAdult)
+                    Text("Налаштування зберігаються на цьому iPhone.").font(.caption2).foregroundStyle(.secondary)
+                }.padding(20).volnaCard(26)
+                HStack { Text("Те, що любиш").font(.title3.bold()); Spacer(); Text("\(channels.count + films.count)").font(.caption).foregroundStyle(.secondary) }
                 if channels.isEmpty && films.isEmpty {
                     EmptyMessage(symbol: "heart", title: "Улюблене буде тут", message: "Натисни сердечко біля каналу або фільму. Обране зберігається на цьому пристрої.")
                 }
@@ -123,13 +161,26 @@ struct MyLibraryView: View {
                     }
                 }
                 VStack(alignment: .leading, spacing: 16) {
-                    Label("VOLNA для iPhone", systemImage: "iphone").font(.headline)
-                    Text("Нативний інтерфейс, системне відтворення, AirPlay і «Картинка в картинці». Реклама, що вже міститься у відеопотоці, може залишатися.").font(.caption).foregroundStyle(.secondary)
-                    Button { settings = true } label: { Label("Налаштування відтворення", systemImage: "gearshape").font(.subheadline) }
-                    Text("Версія 2.1 · Обране зберігається локально. Відео не завантажується для офлайн-перегляду.").font(.caption2).foregroundStyle(.secondary)
+                    Label("Твій перегляд", systemImage: "play.rectangle").font(.headline)
+                    Picker("Таймер сну", selection: Binding(get: { playback.sleepMinutes }, set: { playback.setSleepTimer(minutes: $0) })) { Text("Вимкнено").tag(0); Text("15 хв").tag(15); Text("30 хв").tag(30); Text("60 хв").tag(60) }.font(.subheadline)
+                    if let end = playback.sleepEndsAt { Text("Відео стане на паузу о " + end.formatted(date: .omitted, time: .shortened)).font(.caption2).foregroundStyle(.secondary) }
+                    Button { settings = true } label: { HStack { Label("Якість, звук і субтитри", systemImage: "slider.horizontal.3"); Spacer(); Image(systemName: "chevron.right") }.font(.subheadline) }
+                    HStack {
+                        VStack(alignment: .leading, spacing: 5) { Text("AirPlay").font(.subheadline.weight(.semibold)); Text("Обери телевізор у своїй мережі").font(.caption2).foregroundStyle(.secondary) }
+                        Spacer(); AirPlayRouteButton().frame(width: 44, height: 44)
+                    }
+                    Text("Обране зберігається на пристрої. Відео потребує інтернету.").font(.caption2).foregroundStyle(.secondary)
                 }.padding(20).volnaCard()
             }.padding(20)
-        }.background { CinemaBackdrop() }.navigationTitle("Моє").navigationBarTitleDisplayMode(.inline)
+        }.background { CinemaBackdrop() }.navigationTitle("Налаштування").navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $settings) { PlaybackSettings() }
+    }
+    private func winterSetting(_ title: String, note: String, symbol: String, value: Binding<Bool>) -> some View {
+        Toggle(isOn: value) {
+            HStack(spacing: 12) {
+                Image(systemName: symbol).font(.system(size: 18)).foregroundStyle(Color(red: 0.76, green: 0.88, blue: 0.95)).frame(width: 34, height: 38).background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
+                VStack(alignment: .leading, spacing: 4) { Text(title).font(.subheadline.weight(.medium)); Text(note).font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+            }
+        }.tint(VolnaStyle.coral)
     }
 }

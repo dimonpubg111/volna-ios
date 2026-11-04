@@ -4933,6 +4933,119 @@
         "playlistUrl": "https://www.youtube.com/playlist?list=PL1PP_OaYvIQVTK_ov0eFCCsY-bGy38R4g",
         "playbackTested": false
       }
+    },
+    {
+      "id": "svingery",
+      "type": "movie",
+      "title": "Свінгери",
+      "year": 2018,
+      "genre": "Доросла комедія",
+      "matureContent": true,
+      "duration": "92 хв",
+      "poster": "https://images.1plus1.video/card-6/cuh7frgR/6176b9a906222d011f1d4c30c6057248.custom.jpg",
+      "synopsis": "Кілька пар намагаються повернути у своє життя романтику та опиняються в низці несподіваних знайомств. Комедія для дорослої аудиторії.",
+      "publisher": "1+1 video",
+      "sourceKind": "official-native",
+      "sourcePage": "https://1plus1.video/svingery",
+      "playbackAvailable": true,
+      "sources": [
+        {
+          "type": "hls",
+          "url": "/api/movie?id=svingery",
+          "publicMovieId": "svingery",
+          "label": "Оригінальне озвучення джерела"
+        }
+      ]
+    },
+    {
+      "id": "svingery-2",
+      "type": "movie",
+      "title": "Свінгери 2",
+      "year": 2019,
+      "genre": "Доросла комедія",
+      "matureContent": true,
+      "duration": "86 хв",
+      "poster": "https://images.1plus1.video/card-3/fCQ6y5La/bbeb15c19ec56e876212cc4827c5809e.custom.jpg",
+      "synopsis": "Нові зустрічі, ревнощі та непорозуміння у продовженні української комедії. Для дорослої аудиторії.",
+      "publisher": "1+1 video",
+      "sourceKind": "official-native",
+      "sourcePage": "https://1plus1.video/svingery-2",
+      "playbackAvailable": true,
+      "sources": [
+        {
+          "type": "hls",
+          "url": "/api/movie?id=svingery-2",
+          "publicMovieId": "svingery-2",
+          "label": "Оригінальне озвучення джерела"
+        }
+      ]
+    },
+    {
+      "id": "ya-s-toboj",
+      "type": "movie",
+      "title": "Я з тобою",
+      "year": 2016,
+      "genre": "Мелодрама",
+      "matureContent": false,
+      "duration": "86 хв",
+      "poster": "https://images.1plus1.video/playlist-1/9886/768x576.jpg",
+      "synopsis": "Рома й Олексій кохають Тетяну. Коли вона тяжко хворіє, давні суперники об’єднуються, щоб урятувати її. Українська мелодрама про кохання посеред війни.",
+      "publisher": "1+1 video",
+      "sourceKind": "official-native",
+      "sourcePage": "https://1plus1.video/ya-s-toboj",
+      "playbackAvailable": true,
+      "sources": [
+        {
+          "type": "hls",
+          "url": "/api/movie?id=ya-s-toboj",
+          "publicMovieId": "ya-s-toboj",
+          "label": "Оригінальне озвучення джерела"
+        }
+      ]
+    },
+    {
+      "id": "bitva-za-kiyiv",
+      "type": "movie",
+      "title": "Битва за Київ",
+      "genre": "Документальний",
+      "matureContent": false,
+      "duration": "54 хв",
+      "poster": "https://images.1plus1.video/playlist-1/166299/9538604ad572e40dc1b906f944b3325d.768x576.jpg",
+      "synopsis": "Документальний фільм 1+1 про оборону Києва під час повномасштабного вторгнення. Історії учасників та свідків подій.",
+      "publisher": "1+1 video",
+      "sourceKind": "official-native",
+      "sourcePage": "https://1plus1.video/bitva-za-kiyiv",
+      "playbackAvailable": true,
+      "sources": [
+        {
+          "type": "hls",
+          "url": "/api/movie?id=bitva-za-kiyiv",
+          "publicMovieId": "bitva-za-kiyiv",
+          "label": "Оригінальне озвучення джерела"
+        }
+      ]
+    },
+    {
+      "id": "chat-vijni-moshtun",
+      "type": "movie",
+      "title": "Чат війни. Мощун",
+      "genre": "Документальний",
+      "matureContent": false,
+      "duration": "49 хв",
+      "poster": "https://images.1plus1.video/playlist-1/166587/1051da5b40cc7069eb2f0c8fdcc27a27.768x576.jpg",
+      "synopsis": "Документальна історія про Мощун та людей, які опинилися в центрі битви за Київ. Повний фільм з офіційного відеопорталу 1+1.",
+      "publisher": "1+1 video",
+      "sourceKind": "official-native",
+      "sourcePage": "https://1plus1.video/chat-vijni-moshtun",
+      "playbackAvailable": true,
+      "sources": [
+        {
+          "type": "hls",
+          "url": "/api/movie?id=chat-vijni-moshtun",
+          "publicMovieId": "chat-vijni-moshtun",
+          "label": "Оригінальне озвучення джерела"
+        }
+      ]
     }
   ],
   "channels": [

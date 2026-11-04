@@ -59,6 +59,12 @@ final class LibraryStore: ObservableObject {
     private var archiveChecks: [String: Date] = [:]
     private var archiveInFlight: Set<String> = []
     private let cacheRoot: URL
+    private var reviewFilms: [Film] = []
+    private func includingReviewFilms(_ value: Catalogue) -> Catalogue {
+        var movies = value.movies
+        for film in reviewFilms where !movies.contains(where: { $0.id == film.id }) { movies.append(film) }
+        return Catalogue(channels: value.channels, movies: movies)
+    }
 
     init() {
         favorites = Set(UserDefaults.standard.stringArray(forKey: "native.favorites") ?? [])
@@ -67,8 +73,10 @@ final class LibraryStore: ObservableObject {
         try? FileManager.default.createDirectory(at: cacheRoot, withIntermediateDirectories: true)
         let cached = try? Data(contentsOf: cacheRoot.appendingPathComponent("catalogue.json"))
         let bundled = Bundle.main.url(forResource: "catalog", withExtension: "json").flatMap { try? Data(contentsOf: $0) }
+        reviewFilms = bundled.flatMap { try? JSONDecoder().decode(Catalogue.self, from: $0) }?.movies.filter { OfficialFilmResolver.supports($0.id) } ?? []
         catalogue = cached.flatMap { try? JSONDecoder().decode(Catalogue.self, from: $0) }
             ?? bundled.flatMap { try? JSONDecoder().decode(Catalogue.self, from: $0) }
+        if let value = catalogue { catalogue = includingReviewFilms(value) }
         index = ChannelIndex(catalogue: catalogue)
         catalogueOffline = true
         for id in ["novyi", "tet"] {
@@ -116,7 +124,7 @@ final class LibraryStore: ObservableObject {
             let (value, data) = try await api.load(Catalogue.self, url: VolnaConfiguration.api("catalog.json"))
             guard !value.channels.isEmpty, value.channels.count <= 1000, value.movies.count <= 5000 else { throw LibraryFailure.invalid }
             index = ChannelIndex(catalogue: value)
-            catalogue = value; catalogueOffline = false
+            catalogue = includingReviewFilms(value); catalogueOffline = false
             try? data.write(to: cacheRoot.appendingPathComponent("catalogue.json"), options: .atomic)
             if selectedChannel == nil { channelID = channels.first?.id }
         } catch is CancellationError { return } catch { catalogueOffline = true }

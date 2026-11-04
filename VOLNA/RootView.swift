@@ -7,6 +7,10 @@ struct RootView: View {
     @EnvironmentObject private var playback: PlaybackStore
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @AppStorage("winter.motion") private var motion = true
+    @AppStorage("winter.lightInterface") private var lightInterface = false
+    @AppStorage("winter.largeText") private var largeText = false
+    @Environment(\.dynamicTypeSize) private var systemTextSize
     @State private var tab = MainTab.home
     @State private var film: Film?
 
@@ -23,9 +27,10 @@ struct RootView: View {
             }.tabItem { Label("Фільми", systemImage: "film") }.tag(MainTab.films)
             NavigationStack {
                 MyLibraryView(onChannel: openChannel, onFilm: openFilm).safeAreaInset(edge: .bottom, spacing: 8) { miniPlayer }
-            }.tabItem { Label("Моє", systemImage: "heart") }.tag(MainTab.library)
+            }.tabItem { Label("Налаштування", systemImage: "gearshape") }.tag(MainTab.library)
         }
         .sheet(item: $film) { FilmDetailView(film: $0) }
+        .environment(\.dynamicTypeSize, largeText ? max(systemTextSize, .xLarge) : systemTextSize)
         .task { await library.refreshCatalogue(); await library.refreshSummary(force: true) }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
@@ -34,7 +39,7 @@ struct RootView: View {
                 do { try await Task.sleep(nanoseconds: 60_000_000_000) } catch { break }
             }
         }
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: playback.active)
+        .animation(reduceMotion || !motion || lightInterface ? nil : .easeInOut(duration: 0.22), value: playback.active)
     }
     @ViewBuilder private var miniPlayer: some View {
         if playback.active {
@@ -67,6 +72,7 @@ struct RootView: View {
 
 struct HomeView: View {
     @EnvironmentObject private var library: LibraryStore
+    @AppStorage("winter.hideAdult") private var hideAdult = false
     let onChannel: (Channel) -> Void
     let onFilm: (Film) -> Void
     private var featured: Channel? { library.channels.first }
@@ -75,8 +81,9 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Твій вечір.\nТвоя хвиля.").font(.system(.largeTitle, design: .rounded).weight(.bold))
-                    Text("Улюблене завжди поруч").font(.subheadline).foregroundStyle(.secondary)
+                    Text("ЗИМА 2026 / 2027").font(.system(size: 10, weight: .semibold)).tracking(2).foregroundStyle(Color(red: 0.74, green: 0.87, blue: 0.93))
+                    Text("Зимові вечори.\nТеплі історії.").font(.system(.largeTitle, design: .rounded).weight(.bold))
+                    Text("Улюблена хвиля. Трохи більше затишку.").font(.subheadline).foregroundStyle(.secondary)
                 }.padding(.top, 10)
                 if let featured { hero(featured) }
                 HStack(spacing: 12) {
@@ -111,7 +118,7 @@ struct HomeView: View {
                         sectionTitle("Кіно під настрій", subtitle: "Відкрий історію, яка зачепить")
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(alignment: .top, spacing: 14) {
-                                ForEach(library.films.prefix(8)) { film in FilmCard(film: film, width: 140) { onFilm(film) } }
+                                ForEach(library.films.filter { !hideAdult || $0.matureContent != true }.prefix(8)) { film in FilmCard(film: film, width: 140) { onFilm(film) } }
                             }
                         }
                     }
@@ -128,9 +135,9 @@ struct HomeView: View {
     private func hero(_ channel: Channel) -> some View {
         Button { onChannel(channel) } label: {
             ZStack(alignment: .bottomLeading) {
-                LinearGradient(colors: [Color(hex: channel.color).opacity(0.55), Color.indigo.opacity(0.5), VolnaStyle.ink], startPoint: .topLeading, endPoint: .bottomTrailing)
+                WinterLandscape().accessibilityHidden(true)
                 if let programme = library.now(for: channel), let image = programme.imageURL {
-                    RemoteArtwork(url: image, pixels: 1024)
+                    RemoteArtwork(url: image, pixels: 1024).opacity(0.7)
                 }
                 LinearGradient(colors: [.clear, .black.opacity(0.85)], startPoint: .top, endPoint: .bottom)
                 VStack(alignment: .leading, spacing: 16) {
@@ -143,7 +150,9 @@ struct HomeView: View {
                         Spacer(); Text(channel.title).font(.caption.weight(.semibold)).padding(10).volnaGlass(16)
                     }
                 }.padding(22)
-            }.frame(height: 300).clipShape(RoundedRectangle(cornerRadius: 32))
+            }.overlay(alignment: .top) { WinterSnow().frame(height: 110).allowsHitTesting(false) }
+                .overlay(alignment: .top) { WinterSnowEdge().frame(height: 8) }
+                .frame(height: 260).clipShape(RoundedRectangle(cornerRadius: 32))
                 .overlay(RoundedRectangle(cornerRadius: 32).stroke(.white.opacity(0.15), lineWidth: 0.7))
         }.buttonStyle(.plain).accessibilityLabel("Дивитися " + channel.title)
     }

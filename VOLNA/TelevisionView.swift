@@ -94,13 +94,14 @@ struct TelevisionView: View {
 
 struct ChannelRow: View {
     @EnvironmentObject private var library: LibraryStore
+    @AppStorage("winter.compact") private var compact = false
     let channel: Channel
     var selected = false
     let action: () -> Void
     var body: some View {
         Button(action: action) {
             HStack(spacing: 13) {
-                ChannelLogo(channel: channel)
+                ChannelLogo(channel: channel, size: compact ? 36 : 48)
                 VStack(alignment: .leading, spacing: 5) {
                     Text(channel.title).font(.subheadline.weight(.semibold)).foregroundStyle(selected ? VolnaStyle.rose : .white)
                     Text(library.now(for: channel)?.title ?? "Прямий ефір").font(.caption).foregroundStyle(.secondary).lineLimit(1)
@@ -110,7 +111,7 @@ struct ChannelRow: View {
                 }
                 Spacer(minLength: 0)
                 Image(systemName: selected ? "waveform" : "play.circle").foregroundStyle(selected ? VolnaStyle.coral : .white.opacity(0.35))
-            }.padding(.horizontal, 14).padding(.vertical, 12)
+            }.padding(.horizontal, 14).padding(.vertical, compact ? 7 : 12)
                 .background(selected ? VolnaStyle.coral.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 20))
                 .contentShape(Rectangle())
         }.buttonStyle(.plain).accessibilityLabel("Дивитися " + channel.title)
@@ -142,6 +143,10 @@ struct PlayerStage: View {
                         Button("Повторити") { playback.retry() }.buttonStyle(.borderedProminent).buttonBorderShape(.capsule)
                     }.padding(20).frame(maxWidth: .infinity, maxHeight: .infinity).background(.black.opacity(0.8))
                 }
+            } else if displaysActive && playback.loading {
+                VStack(spacing: 12) { ProgressView().tint(.white); Text("Завантажуємо ваш фільм…").font(.caption).foregroundStyle(.secondary) }
+            } else if displaysActive, let error = playback.error {
+                VStack(spacing: 12) { Text(error).font(.caption).multilineTextAlignment(.center); Button("Повторити") { playback.retry() }.buttonStyle(.borderedProminent) }.padding(20)
             } else {
                 LinearGradient(colors: [VolnaStyle.coral.opacity(0.18), Color.indigo.opacity(0.2), .black], startPoint: .topLeading, endPoint: .bottomTrailing)
                 VStack(spacing: 12) {
@@ -182,6 +187,7 @@ struct ProgrammeGuideView: View {
     }
     var body: some View {
         VStack(spacing: 10) {
+            WinterSnowEdge().frame(height: 7).padding(.horizontal, 16)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(-2...1, id: \.self) { offset in

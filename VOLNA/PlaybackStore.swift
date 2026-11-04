@@ -45,6 +45,24 @@ final class PlaybackStore: ObservableObject {
     private var trackTask: Task<Void, Never>?
     private var waitingTask: Task<Void, Never>?
     private var notificationTokens: [NSObjectProtocol] = []
+    private var filmResolver: Task<Void, Never>?
+    private var pendingFilm: Film?
+    @Published private(set) var sleepMinutes = 0
+    @Published private(set) var sleepEndsAt: Date?
+    private var sleepTask: Task<Void, Never>?
+
+    func setSleepTimer(minutes: Int) {
+        sleepTask?.cancel(); sleepTask = nil
+        sleepMinutes = [15, 30, 60].contains(minutes) ? minutes : 0
+        sleepEndsAt = sleepMinutes > 0 ? Date().addingTimeInterval(Double(sleepMinutes * 60)) : nil
+        guard sleepMinutes > 0 else { return }
+        let delay = UInt64(sleepMinutes) * 60_000_000_000
+        sleepTask = Task { [weak self] in
+            do { try await Task.sleep(nanoseconds: delay) } catch { return }
+            guard let self, !Task.isCancelled else { return }
+            self.player.pause(); self.sleepMinutes = 0; self.sleepEndsAt = nil; self.sleepTask = nil
+        }
+    }
 
     init() {
         quality = PlaybackQuality(rawValue: UserDefaults.standard.string(forKey: "native.quality") ?? "") ?? .automatic
@@ -53,6 +71,10 @@ final class PlaybackStore: ObservableObject {
         player.publisher(for: \.timeControlStatus).receive(on: DispatchQueue.main).sink { [weak self] status in
             guard let self else { return }
             self.isPlaying = status == .playing
+            if status == .playing, self.recordingID != nil {
+                // Start with a small buffer, then build a reserve while watching.
+                self.player.currentItem?.preferredForwardBufferDuration = 30
+            }
             if self.player.currentItem?.status == .readyToPlay { self.loading = status == .waitingToPlayAtSpecifiedRate }
             self.waitingTask?.cancel(); self.slowConnection = false
             if status == .waitingToPlayAtSpecifiedRate {
@@ -77,7 +99,7 @@ final class PlaybackStore: ObservableObject {
         })
     }
 
-    deinit { trackTask?.cancel(); waitingTask?.cancel(); notificationTokens.forEach { NotificationCenter.default.removeObserver($0) } }
+    deinit { sleepTask?.cancel(); filmResolver?.cancel(); trackTask?.cancel(); waitingTask?.cancel(); notificationTokens.forEach { NotificationCenter.default.removeObserver($0) } }
     var isLive: Bool { channelID != nil && recordingID == nil }
     var hasVideo: Bool { active && player.currentItem != nil }
 
@@ -94,17 +116,38 @@ final class PlaybackStore: ObservableObject {
         start(url: url, offset: recording.offset, limit: recording.status == "recording" ? nil : recording.playbackLimit)
     }
     func play(film: Film) {
+        if let id = film.nativeSource?.publicMovieId, OfficialFilmResolver.supports(id) {
+            stop(); let request = generation
+            filmID = film.id; title = film.title; subtitle = "Офіційне джерело 1+1 · завантаження…"
+            active = true; loading = true; pendingFilm = film
+            filmResolver = Task { [weak self] in
+                do {
+                    let url = try await OfficialFilmResolver.resolve(id)
+                    guard let self, self.generation == request, !Task.isCancelled else { return }
+                    self.filmResolver = nil; self.pendingFilm = nil
+                    self.subtitle = [film.year.map(String.init), film.genre].compactMap { $0 }.joined(separator: " · ")
+                    self.start(url: url, offset: 0, limit: nil)
+                } catch {
+                    guard let self, self.generation == request, !Task.isCancelled else { return }
+                    self.loading = false; self.filmResolver = nil
+                    self.error = "Джерело фільму зараз не відповідає у вашій мережі. Спробуйте ще раз."
+                }
+            }
+            return
+        }
         guard let url = film.nativeSource?.nativeURL else { return }
         channelID = nil; recordingID = nil; filmID = film.id
         title = film.title; subtitle = [film.year.map(String.init), film.genre].compactMap { $0 }.joined(separator: " · ")
         start(url: url, offset: 0, limit: nil)
     }
     func retry() {
+        if let pendingFilm { play(film: pendingFilm); return }
         guard let currentURL else { return }
         let position = player.currentTime().seconds
         start(url: currentURL, offset: isLive ? 0 : max(initialOffset, position.isFinite ? position : 0), limit: playbackLimit)
     }
     func stop() {
+        filmResolver?.cancel(); filmResolver = nil; pendingFilm = nil
         generation = UUID(); trackTask?.cancel(); waitingTask?.cancel(); itemCancellables.removeAll()
         player.pause(); player.replaceCurrentItem(with: nil)
         active = false; loading = false; slowConnection = false; error = nil; currentURL = nil
@@ -117,6 +160,7 @@ final class PlaybackStore: ObservableObject {
     func subtitles(_ option: AVMediaSelectionOption?) { if let subtitleGroup { player.currentItem?.select(option, in: subtitleGroup) } }
 
     private func start(url: URL, offset: Double, limit: Double?) {
+        filmResolver?.cancel(); filmResolver = nil; pendingFilm = nil
         generation = UUID(); let request = generation
         trackTask?.cancel(); waitingTask?.cancel(); itemCancellables.removeAll()
         player.pause(); currentURL = url; initialOffset = offset; playbackLimit = limit
@@ -128,7 +172,7 @@ final class PlaybackStore: ObservableObject {
         } catch { self.error = "Не вдалося увімкнути звук. Спробуйте ще раз."; loading = false; return }
         let asset = AVURLAsset(url: url)
         let item = AVPlayerItem(asset: asset)
-        item.preferredForwardBufferDuration = isLive ? 12 : 30
+        item.preferredForwardBufferDuration = isLive ? 12 : (recordingID != nil ? 5 : 30)
         item.preferredPeakBitRate = quality.maximumBitrate
         item.canUseNetworkResourcesForLiveStreamingWhilePaused = false
         if let limit { item.forwardPlaybackEndTime = CMTime(seconds: limit, preferredTimescale: 600) }
@@ -143,7 +187,7 @@ final class PlaybackStore: ObservableObject {
             case .readyToPlay:
                 self.loading = false
                 if offset > 0 {
-                    self.player.seek(to: CMTime(seconds: offset, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] done in
+                    self.player.seek(to: CMTime(seconds: offset, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: CMTime(seconds: self.recordingID != nil ? 0.25 : 0, preferredTimescale: 600)) { [weak self] done in
                         Task { @MainActor in
                             guard let self, self.generation == request else { return }
                             if done { self.player.play() }
