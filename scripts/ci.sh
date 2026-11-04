@@ -2,6 +2,15 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p build
+python3 - <<'PY'
+from pathlib import Path
+import hashlib, zipfile
+archive = Path('winter-assets-2.2.zip')
+assert hashlib.sha256(archive.read_bytes()).hexdigest() == '23a5ed2585744cd690d77e1b309fe5a4c02276502b3c1ab05b7bc0770f7c5fee', 'Winter asset checksum mismatch'
+with zipfile.ZipFile(archive) as bundle:
+    assert all(name.startswith('VOLNA/Assets.xcassets/') and '..' not in Path(name).parts for name in bundle.namelist())
+    bundle.extractall('.')
+PY
 python3 scripts/generate_project.py
 plutil -lint VOLNA/Info.plist VOLNA/PrivacyInfo.xcprivacy VOLNA.xcodeproj/project.pbxproj
 xcodebuild -version
