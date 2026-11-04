@@ -1,21 +1,21 @@
 name: VOLNA native iPhone
-
 on:
   workflow_dispatch:
-
+  push:
+    branches: [main]
+    paths: ['VOLNA/**', 'VOLNATests/**', 'VOLNAUITests/**', 'VOLNA.xcodeproj/**', 'scripts/**', '.github/workflows/ios.yml']
 permissions:
   contents: read
-
 jobs:
   native:
     runs-on: macos-26
     timeout-minutes: 30
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
-
       - name: Build native app and run simulator tests
         run: bash scripts/ci.sh
-
       - name: Save build results
         if: always()
         uses: actions/upload-artifact@v4
@@ -25,5 +25,15 @@ jobs:
             build/*.zip
             build/*.ipa
             build/*.xcresult
-          retention-days: 3
+          retention-days: 7
           if-no-files-found: warn
+      - name: Publish verified IPA
+        if: success() && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v2.2.0 >/dev/null 2>&1; then
+            echo 'Release v2.2.0 already exists. Keeping existing files; new build is available in artifacts.'
+          else
+            gh release create v2.2.0 build/VOLNA-2.2-UNSIGNED.ipa --target "$GITHUB_SHA" --title 'VOLNA 2.2 — зимова хвиля' --notes-file RELEASE-2.2.md
+          fi
